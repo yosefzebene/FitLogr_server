@@ -1,12 +1,26 @@
 import mongoose from "mongoose";
 
 const schema = mongoose.Schema({
-    first_name: String,
-    last_name: String,
-    email: String,
-    password: String,
-    roles: [String],
-    workouts: []
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    roles: {
+        type: [String],
+        validate: v => Array.isArray(v) && v.length > 0
+    }
 });
 
 const User = mongoose.model('User', schema);
