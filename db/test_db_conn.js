@@ -5,7 +5,7 @@ let mongo = null;
 
 const connectDB = async () => {
     mongo = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
+    const uri = mongo.getUri();
 
     await mongoose.connect(uri, {
         useNewUrlParser: true
@@ -24,7 +24,7 @@ const dropCollections = async () => {
     if (mongo) {
         const collections = await mongoose.connection.db.collections();
         for (let collection of collections) {
-            await collection.remove();
+            await collection.drop();
         }
     }
 };
