@@ -1,17 +1,16 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db  from '../db/conn.js';
+import User from '../models/User.js';
 
 const handleAuthentication = async (req, res) => {
     try {
-        const collection = db.collection("users");
 
         const query = { email: req.body.email };
-        const user = await collection.findOne(query);
+        const user = await User.findOne(query);
         if (!user)
             return res.status(401).send({
                 status: "error",
-                code: res.code,
+                code: 401,
                 message: "Invalid email or password"
             });
 
@@ -19,7 +18,7 @@ const handleAuthentication = async (req, res) => {
         if (!valid)
             return res.status(401).send({
                 status: "error",
-                code: res.code,
+                code: 401,
                 message: "Invalid email or password"
             });
 
@@ -30,7 +29,7 @@ const handleAuthentication = async (req, res) => {
             roles: user.roles,
         }, process.env.jwtPrivateKey, { expiresIn: "15m" });
 
-        res.status(200).send({
+        res.status(200).json({
             status: "success",
             data: {
                 token: token

@@ -1,26 +1,33 @@
 import bcrypt from 'bcrypt';
-import db  from '../db/conn.js';
+import User from '../models/User.js';
 
 const createUser = async (req, res) => {
-    try {
-        const collection = db.collection("users");
-        
+    try {        
         const salt = await bcrypt.genSalt(15);
-        const user = {
+        const user = new User({
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, salt),
             roles: [ "user" ]
-        };
+        });
 
-        const result = await collection.insertOne(user);
+        const result = await user.save();
 
-        console.log(`User document was inserted with _id: ${result.insertedId}`)
-        res.status(201).json(result);
+        console.log(`User document was inserted with _id: ${result._id}`)
+        res.status(201).json({
+            status: "success",
+            data: result,
+            message: "Authentication successful"
+        });
     }
     catch (e) {
         console.log(e);
+        res.status(400).send({
+            status: "error",
+            code: 400,
+            message: e.message
+        });
     }
 }
 
