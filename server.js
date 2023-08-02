@@ -4,17 +4,16 @@ import './loadEnvironment.js';
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
 
-const serverApp = (database) => {
-    const app = express();
+const port = process.env.port || 5000;
+const app = express();
 
-    app.use(cors());
-    app.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-    //load Routes
-    app.use('/auth', authRoutes(database));
-    app.use('/users', userRoutes(database));
+//load Routes
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
-    return app;
-}
-
-export default serverApp;
+app.listen(port, () => {
+    console.log(`FitLogr server is listening on port ${port}`);
+})

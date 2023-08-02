@@ -1,12 +1,8 @@
 import { Router } from 'express';
 import * as authController from '../controllers/authController.js';
 
-const authRoutes = (database) => {
-    const routes = Router();
+const authRoutes = Router();
 
-    routes.post('/', authController.handleAuthentication(database));
-
-    return routes;
-}
+authRoutes.post('/', authController.handleAuthentication);
 
 export default authRoutes;
