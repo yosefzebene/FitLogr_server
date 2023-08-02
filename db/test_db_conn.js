@@ -1,17 +1,32 @@
-import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
 
-const mongoServer = await MongoMemoryServer.create();
-const uri = mongoServer.getUri();
-const client = new MongoClient(uri);
+let mongo = null;
 
-let conn;
-try {
-    conn = await client.connect();
-} catch(e) {
-    console.error(e);
-}
+const connectDB = async () => {
+    mongo = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
 
-let test_db = conn.db("fitLogr");
+    await mongoose.connect(uri, {
+        useNewUrlParser: true
+    });
+};
 
-export default test_db;
+const dropDB = async () => {
+    if (mongo) {
+        await mongoose.connection.dropDatabase();
+        await mongoose.connection.close();
+        await mongo.stop();
+    }
+};
+
+const dropCollections = async () => {
+    if (mongo) {
+        const collections = await mongoose.connection.db.collections();
+        for (let collection of collections) {
+            await collection.remove();
+        }
+    }
+};
+
+export { connectDB, dropDB, dropCollections };
