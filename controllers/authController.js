@@ -4,7 +4,6 @@ import User from '../models/User.js';
 
 const handleAuthentication = async (req, res) => {
     try {
-
         const query = { email: req.body.email };
         const user = await User.findOne(query);
         if (!user)
@@ -39,6 +38,11 @@ const handleAuthentication = async (req, res) => {
     }
     catch (e) {
         console.log(e);
+        res.status(500).send({
+            status: "error",
+            code: 500,
+            message: e.message
+        });
     }
 }
 

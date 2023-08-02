@@ -3,6 +3,7 @@ import app from '../server.js';
 import { connectDB, dropDB, dropCollections } from '../db/test_db_conn.js';
 
 const request = supertest(app);
+const testEndpoint = '/users/create';
 
 beforeAll(async () => {
     await connectDB();
@@ -20,7 +21,6 @@ describe("POST /users/create", () => {
     describe("Given valid fields", () => {
         it("should respond with a 201 status code and document ID", async () => {
             // Test data
-            const testEndpoint = '/users/create';
             const testUser = {
                 first_name: "test",
                 last_name: "person",
@@ -41,7 +41,6 @@ describe("POST /users/create", () => {
     describe("Given invalid fields", () => {
         it("should respond with a 400 status code and error message", async () => {
             // Test data
-            const testEndpoint = '/users/create';
             const testUser = {
                 first_name: "",
                 last_name: "person",
