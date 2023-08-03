@@ -48,20 +48,20 @@ afterAll(async () => {
 describe("POST /workouts", () => {
     describe("Given valid fields", () => {
         it("should respond with a 201 status code and document ID", async () => {
-            const validWorkout = {
+            const validWorkouts = [{
                 name: "testWorkout",
                 description: "test workout description."
-            }
+            }];
 
             const expectedStatus = 201;
 
             const response = await request.post(testEndpoint).set('x-auth-token', token).send(validWorkout);
 
-            // Save workout _id for later tests
-            testWorkoutId = response.body.data._id;
+            // Save a workout _id for later tests
+            testWorkoutId = response.body.data[0]._id;
 
             expect(response.status).toBe(expectedStatus);
-            expect(response.body.data._id).not.toBeNull();
+            expect(response.body.data[0]._id).not.toBeNull();
         })
     })
 
