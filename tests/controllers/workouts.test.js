@@ -1,8 +1,8 @@
 import supertest from 'supertest';
-import app from '../server.js';
-import User from '../models/User.js';
+import app from '../../server.js';
+import User from '../../models/User.js';
 import bcrypt from 'bcrypt';
-import { connectDB, dropDB } from '../db/test_db_conn.js';
+import { connectDB, dropDB } from '../../db/test_db_conn.js';
 
 const request = supertest(app);
 const testEndpoint = '/workouts/';

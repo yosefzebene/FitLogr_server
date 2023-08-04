@@ -1,6 +1,6 @@
 import supertest from "supertest";
-import app from '../server.js';
-import { connectDB, dropDB, dropCollections } from '../db/test_db_conn.js';
+import app from '../../server.js';
+import { connectDB, dropDB, dropCollections } from '../../db/test_db_conn.js';
 
 const request = supertest(app);
 const testEndpoint = '/users/create';
