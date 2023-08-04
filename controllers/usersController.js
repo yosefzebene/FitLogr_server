@@ -18,7 +18,7 @@ const createUser = async (req, res) => {
         res.status(201).json({
             status: "success",
             data: result,
-            message: "Authentication successful"
+            message: "Registration successful"
         });
     }
     catch (e) {
