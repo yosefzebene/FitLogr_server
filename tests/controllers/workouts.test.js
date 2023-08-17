@@ -1,30 +1,15 @@
 import supertest from 'supertest';
 import app from '../../server.js';
-import User from '../../models/User.js';
-import bcrypt from 'bcrypt';
-import { connectDB, dropDB } from '../../db/test_db_conn.js';
+import { connectDB, dropDB, dropCollections, setupTestData } from '../../db/test_db_conn.js';
 
 const request = supertest(app);
 const testEndpoint = '/workouts/';
 
 // Values needed for tests
-let token = "Bearer ";
+let token = null;
 let testWorkoutId = null;
 const nonExistentId = "64136649b2a56c9a4f9c4170";
 const invalidId = "64136649";
-
-const addTestUser = async () => {
-    const salt = await bcrypt.genSalt(15);
-    const testUser = new User({
-        first_name: "test",
-        last_name: "person",
-        email: "testperson@testemail.com",
-        password: await bcrypt.hash("testpassword", salt),
-        roles: [ "user", "admin" ]
-    });
-
-    await testUser.save();
-}
 
 const authenticateTestUser = async () => {
     const credentials = {
@@ -32,18 +17,25 @@ const authenticateTestUser = async () => {
         password: "testpassword"
     }
     const response = await request.post('/auth').send(credentials);
-    token += response.body.data.token;
+    token = "Bearer " + response.body.data.token;
 }
 
 beforeAll(async () => {
     await connectDB();
-    await addTestUser();
-    await authenticateTestUser();
 });
 
 afterAll(async () => {
     await dropDB();
 });
+
+beforeEach(async () => {
+    testWorkoutId = await setupTestData();
+    await authenticateTestUser();
+})
+
+afterEach(async () => {
+    await dropCollections();
+})
 
 describe("POST /workouts", () => {
     describe("Given valid fields", () => {
