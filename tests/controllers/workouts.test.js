@@ -29,7 +29,8 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-    testWorkoutId = await setupTestData();
+    const { testWorkout } = await setupTestData();
+    testWorkoutId = testWorkout.id;
     await authenticateTestUser();
 })
 
@@ -48,9 +49,6 @@ describe("POST /workouts", () => {
             const expectedStatus = 201;
 
             const response = await request.post(testEndpoint).set('x-auth-token', token).send(validWorkouts);
-
-            // Save a workout _id for later tests
-            testWorkoutId = response.body.data[0]._id;
 
             expect(response.status).toBe(expectedStatus);
             expect(response.body.data[0]._id).not.toBeNull();
@@ -94,7 +92,6 @@ describe("GET /workouts", () => {
 
 describe("GET /workouts/:id", () => {
     describe("Given valid ID", () => {
-        // TODO: make this test none dependant on the POST request test
         it("should respond with a 200 status code and a workout", async () => {
             const expectedStatus = 200;
             const expectedData = {
@@ -138,7 +135,6 @@ describe("GET /workouts/:id", () => {
 
 describe("DELETE /workouts/:id", () => {
     describe("Given valid ID", () => {
-        // TODO: make this test none dependant on the POST request test
         it("should respond with a 200 status code and delete confirmation", async () => {
             const expectedStatus = 200;
             const expectedData = {

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const schema = mongoose.Schema({
-    first_name: {
+const schema = new mongoose.Schema({
+    first_name: { 
         type: String,
         required: true
     },
