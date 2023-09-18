@@ -8,6 +8,7 @@ const testEndpoint = '/users/create';
 let token = null;
 let testWorkout = null;
 let testUser = null;
+let testUserWorkout = null;
 
 const authenticateTestUser = async () => {
     const credentials = {
@@ -27,7 +28,7 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-    ({ testWorkout, testUser } = await setupTestData());
+    ({ testWorkout, testUser, testUserWorkout } = await setupTestData());
     await authenticateTestUser();
 })
 
@@ -79,20 +80,23 @@ describe("POST /users/create", () => {
 })
 
 describe("GET /users/me/workouts", () => {
-    it("should respond with 200 status code and an array of workouts", () => {
+    it("should respond with 200 status code and an array of workouts", async () => {
         const expectedStatus = 200;
         const expectedData = [
             {
-                name: testWorkout.name,
-                description: testWorkout.description,
+                workout_id: {
+                    _id: testWorkout.id,
+                    name: testWorkout.name,
+                    description: testWorkout.description
+                },
                 day: 1
             }
         ];
 
-        const response = request.get('/users/me/workouts').set('x-auth-token', token);
+        const response = await request.get('/users/me/workouts').set('x-auth-token', token);
 
         expect(response.status).toBe(expectedStatus);
-        expect(response.body.data).toEqual(expectedData);
+        expect(response.body.data).toMatchObject(expectedData);
     })
 })
 
@@ -156,14 +160,14 @@ describe("POST /users/me/workouts", () => {
 describe("PATCH /users/me/workouts", () => {
     it("Given valid fields - should respond with a 200 status code and the updated workout", async () => {
         const validUpdate  = {
-            workout_id: testWorkout.id,
-            from_day: testWorkout.day,
-            to_day: 5
+            workout_id: testUserWorkout.workout_id.toString(),
+            old_day: testUserWorkout.day,
+            new_day: 5
         }
 
         const expectedStatus = 200;
         const expectedData = {
-            workout_id: testWorkout.id,
+            workout_id: testUserWorkout.workout_id.toString(),
             user_id: testUser.id,
             day: 5
         }
@@ -176,15 +180,15 @@ describe("PATCH /users/me/workouts", () => {
 
     it("Given a non existing user workout - should respond with a 404 status code and error message", async () => {
         const invalidUpdate = {
-            workout_id: "64136649b2a56c9a4f9c4170",
-            from_day: testWorkout.day,
-            to_day: 5
+            workout_id: testUserWorkout.workout_id.toString(),
+            old_day: testUserWorkout.day + 3,
+            new_day: 5
         }
 
         const expectedStatus = 404;
         const expectedErrorMessage = "Specified workout is not part of the users list - no updates were made";
 
-        const response = (await request.patch('/users/me/workouts').set('x-auth-token', token)).setEncoding(invalidUpdate);
+        const response = await request.patch('/users/me/workouts').set('x-auth-token', token).send(invalidUpdate);
 
         expect(response.status).toBe(expectedStatus);
         expect(response.body.message).toBe(expectedErrorMessage);
@@ -193,8 +197,8 @@ describe("PATCH /users/me/workouts", () => {
     it("Given invalid \"workout_id\" - should respond with a 400 status code and error message", async () => {
         const invalidUpdate = {
             workout_id: "",
-            from_day: testWorkout.day,
-            to_day: 5
+            old_day: testUserWorkout.day,
+            new_day: 5
         }
 
         const expectedStatus = 400;
@@ -206,11 +210,11 @@ describe("PATCH /users/me/workouts", () => {
         expect(response.body.message).toBe(expectedErrorMessage);
     })
 
-    it("Given invalid \"to_day\" - should respond with a 400 status code and error message", async () => {
+    it("Given invalid \"new_day\" - should respond with a 400 status code and error message", async () => {
         const invalidUpdate  = {
-            workout_id: testWorkout.id,
-            from_day: testWorkout.day,
-            to_day: ""
+            workout_id: testUserWorkout.workout_id.toString(),
+            old_day: testUserWorkout.day,
+            new_day: ""
         }
 
         const expectedStatus = 400;
