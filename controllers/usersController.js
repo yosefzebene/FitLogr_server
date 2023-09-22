@@ -123,4 +123,38 @@ const changeWorkoutDay = async(req, res) => {
     }
 }
 
-export { createUser, getAllWorkouts, addWorkoutsToPlan, changeWorkoutDay };
+const deleteWorkout = async(req, res) => {
+    try {
+        const query = {
+            user_id: new mongoose.Types.ObjectId(req.user.id),
+            workout_id: new mongoose.Types.ObjectId(req.body.workout_id),
+            day: req.body.day
+        }
+
+        const result = await UserWorkout.findOneAndDelete(query);
+
+        if (!result) {
+            return res.status(404).json({
+                status: "error",
+                code: 404,
+                message: "Specified workout is not part of the users list - Nothing was deleted"
+            })
+        }
+
+        res.status(200).json({
+            status: "success",
+            data: result,
+            message: "User Workout successfully deleted"
+        })
+    }
+    catch (e) {
+        console.log(e);
+        res.status(400).json({
+            status: "error",
+            code: 400,
+            message: e.message
+        })
+    }
+}
+
+export { createUser, getAllWorkouts, addWorkoutsToPlan, changeWorkoutDay, deleteWorkout };

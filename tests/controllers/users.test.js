@@ -238,7 +238,7 @@ describe("DELETE /users/me/workouts", () => {
         const expectedData = {
             workout_id: testUserWorkout.workout_id.toString(),
             user_id: testUser.id,
-            day: 5
+            day: testUserWorkout.day
         }
 
         const response = await request.delete('/users/me/workouts').set('x-auth-token', token).send(validDelete);
