@@ -227,6 +227,53 @@ describe("PATCH /users/me/workouts", () => {
     })
 })
 
-// describe("DELETE /users/me/workouts", () => {
+describe("DELETE /users/me/workouts", () => {
+    it("Given valid fields - should respond with a 200 status code and delete confirmation", async () => {
+        const validDelete = {
+            workout_id: testUserWorkout.workout_id.toString(),
+            day: testUserWorkout.day,
+        }
 
-// })
+        const expectedStatus = 200;
+        const expectedData = {
+            workout_id: testUserWorkout.workout_id.toString(),
+            user_id: testUser.id,
+            day: 5
+        }
+
+        const response = await request.delete('/users/me/workouts').set('x-auth-token', token).send(validDelete);
+
+        expect(response.status).toBe(expectedStatus);
+        expect(response.body.data).toMatchObject(expectedData);
+    })
+
+    it("Given a non existing user workout - should respond with a 404 status code and an error message", async () => {
+        const invalidDelete = {
+            workout_id: testUserWorkout.workout_id.toString(),
+            day: testUserWorkout.day + 3
+        }
+
+        const expectedStatus = 404;
+        const expectedErrorMessage = "Specified workout is not part of the users list - Nothing was deleted";
+
+        const response = await request.delete('/users/me/workouts').set('x-auth-token', token).send(invalidDelete);
+
+        expect(response.status).toBe(expectedStatus);
+        expect(response.body.message).toBe(expectedErrorMessage);
+    })
+
+    it("Given invalid \"workout_id\" - should respond with a 400 status code and error message", async () => {
+        const invalidDelete = {
+            workout_id: "",
+            day: testUserWorkout.day
+        }
+
+        const expectedStatus = 400;
+        const expectedErrorMessage = "Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer";
+
+        const response = await request.delete('/users/me/workouts').set('x-auth-token', token).send(invalidDelete);
+
+        expect(response.status).toBe(expectedStatus);
+        expect(response.body.message).toBe(expectedErrorMessage);
+    })
+})
